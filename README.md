@@ -1,4 +1,4 @@
-# PYPOTREE (potree for jupyter notebooks)
+# PyPotree (potree for jupyter notebooks)
 
 Allows to insert potree cells into jupyter and colab notebooks
 
