@@ -1,8 +1,11 @@
-# PyPotree (potree for jupyter notebooks)
+# PyPotree (potree for jupyter notebooks and colab)
 
 Allows to insert potree cells into jupyter and colab notebooks
 
 [Gabriele Facciolo](mailto:gfacciol@gmail.com), Gabriele Facciolo, CMLA 2019
+
+[**Try it on colab here**](https://colab.research.google.com/drive/1It3EbWy9W8Xf65ikP-_tpkVdJRmvwTQT)
+
 
 # Installation and dependencies
 
