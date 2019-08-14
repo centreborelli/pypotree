@@ -41,7 +41,7 @@ def generate_cloud_for_display(xyz):
 	os.system("{BIN}/PotreeConverter .tmp.txt -f xyz -o point_clouds -p {idd} --material ELEVATION --edl-enabled --overwrite".format(BIN=BIN, idd=unique_dirname))
 
 
-	return ('pointclouds/{idd}'.format(idd=unique_dirname))
+	return ('{idd}'.format(idd=unique_dirname))
  
 
 
@@ -81,26 +81,25 @@ def display_cloud_colab(xyz):
 		from six.moves import socketserver
 		from six.moves import SimpleHTTPServer
 
-
-		#import os
-		#os.chdir('/content/point_clouds/')
-
+		import time
 
 		class V6Server(socketserver.TCPServer):
 			address_family = socket.AF_INET6
 
 		class Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 			def do_GET(self):
+				#super().do_GET()
 				self.send_response(200)
 				# If the response should not be cached in the notebook for
 				# offline access:
 				self.send_header('x-colab-notebook-cache-control', 'no-cache')
 				self.end_headers()
+				
 				#self.wfile.write(b'''hola!''')
 				self.wfile.write(b'''
-				document.querySelector('#output-area').appendChild(document.createTextNode('Script result!'));
-				''')
-
+				    document.querySelector('#output-area').appendChild(document.createTextNode('Script result!'));
+                    ''')
+		#global port
 		port = portpicker.pick_unused_port()
 
 		### SERVING ALL THE FILES
@@ -113,107 +112,25 @@ def display_cloud_colab(xyz):
 
 		thread = threading.Thread(target=server_entry)
 		thread.start()
-		print (port)
-		print (thread)
-		import time
-		time.sleep(1)
+  
+		print ("server on port {}: thread {} ".format( port, thread ) )
 
 
+	text = open('point_clouds/{}.html'.format(xyz) ).read()
 
-	text="""
-		<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="utf-8">
-			<meta name="description" content="">
-			<meta name="author" content="">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-			<title>Potree Viewer</title>
-
-			<link rel="stylesheet" type="text/css" href="libs/potree/potree.css">
-			<link rel="stylesheet" type="text/css" href="libs/jquery-ui/jquery-ui.min.css">
-			<link rel="stylesheet" type="text/css" href="libs/perfect-scrollbar/css/perfect-scrollbar.css">
-			<link rel="stylesheet" href="libs/openlayers3/ol.css" type="text/css">
-			<link rel="stylesheet" href="libs/spectrum/spectrum.css" type="text/css">
-		</head>
-
-		<body>
-		
-			<script src="libs/jquery/jquery-3.1.1.js"></script>
-			<script src="libs/spectrum/spectrum.js"></script>
-			
-			<script src="libs/perfect-scrollbar/js/perfect-scrollbar.jquery.js"></script>
-			<script src="libs/jquery-ui/jquery-ui.min.js"></script>
-			<script src="libs/three.js/build/three.js"></script>
-			<script src="libs/other/stats.min.js"></script>
-			<script src="libs/other/BinaryHeap.js"></script>
-			<script src="libs/tween/tween.min.js"></script>
-			<script src="libs/d3/d3.js"></script>
-			<script src="libs/proj4/proj4.js"></script>
-			<script src="libs/openlayers3/ol.js"></script>
-			<script src="libs/i18next/i18next.js"></script>
-			
-			<script src="libs/potree/potree.colab.js"></script>
-			
-			<script src="libs/plasio/js/laslaz.js"></script>
-			<script src="libs/plasio/vendor/bluebird.js"></script>
-
-			<div class="potree_container" style="position: absolute; width: 100%; height: 500px; left: 0px; top: 0px; ">
-				<div id="potree_render_area"></div>
-				<div id="potree_sidebar_container"> </div>
-			</div>
-			
-			<script>
-			
-				window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-				
-				viewer.setEDLEnabled(true);
-				viewer.setFOV(60);
-				viewer.setPointBudget(1*1000*1000);
-				document.title = "";
-				viewer.setEDLEnabled(true);
-				viewer.setBackground("gradient"); // ["skybox", "gradient", "black", "white"];
-				viewer.setDescription(``);
-				viewer.loadSettingsFromURL();
-				
-				viewer.loadGUI(() => {
-					viewer.setLanguage('en');
-					$("#menu_tools").next().show();
-					//viewer.toggleSidebar();
-				});
-				
-				Potree.loadPointCloud("pointcloudpath/cloud.js", "test", e => {
-					let pointcloud = e.pointcloud;
-					let material = pointcloud.material;
-					viewer.scene.addPointCloud(pointcloud);
-					material.pointColorType = Potree.PointColorType.ELEVATION; // any Potree.PointColorType.XXXX 
-					material.size = 1;
-					material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-					material.shape = Potree.PointShape.SQUARE;
-					viewer.fitToScreen();
-				});
-				
-			</script>
-			
-			
-		</body>
-		</html>
-	"""
-
-	pointcloudpath='https://localhost:{port}/point_clouds/{xyz}'.format(port=port, xyz=xyz)
+	pointcloudpath='https://localhost:{port}/point_clouds/pointclouds/{xyz}'.format(port=port, xyz=xyz)
 
 	print (pointcloudpath)
 
-	newtext = (text.replace('src="', 'src="https://localhost:{port}/point_clouds/'.format(port=port)))
+	newtext = text.replace('src="', 'src="https://localhost:{port}/point_clouds/'.format(port=port))
 	newtext = newtext.replace('href="', 'href="https://localhost:{port}/point_clouds/'.format(port=port))
 	#newtext = newtext.replace('"pointclouds/', '"https://localhost:{port}/pointclouds/'.format(port=port))
-	newtext = newtext.replace('pointcloudpath', pointcloudpath)
+	newtext = newtext.replace('pointclouds/{}'.format(xyz), pointcloudpath)
 
-
+	newtext = newtext.replace('width: 100%; height: 100%;', 'width: 100%; height: 500px;')
+	newtext = newtext.replace('libs/potree/potree.js', 'libs/potree/potree.colab.js' )
 
 	import IPython
 
 	return IPython.display.HTML(newtext)
  
-
-
