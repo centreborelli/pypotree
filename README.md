@@ -22,9 +22,10 @@ It is written in Python and contains Potree and PotreeConverter. It was tested w
 
 In a Python interpreter:
 
-    >>> import pypotree 
-    >>> import numpy as np
-    >>> xyz = np.random.random((100000,3))
-    >>> cloudpath = pypotree.generate_cloud_for_display(xyz)
-    >>> pypotree.display_cloud_colab(cloudpath)
+
+     import pypotree 
+     import numpy as np
+     xyz = np.random.random((100000,3))
+     cloudpath = pypotree.generate_cloud_for_display(xyz)
+     pypotree.display_cloud_colab(cloudpath)
 
