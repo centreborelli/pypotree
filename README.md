@@ -20,8 +20,7 @@ It is written in Python and contains Potree and PotreeConverter. It was tested w
 
 # Usage
 
-In a Python interpreter:
-
+In Colab: 
 
      import pypotree 
      import numpy as np
@@ -29,3 +28,11 @@ In a Python interpreter:
      cloudpath = pypotree.generate_cloud_for_display(xyz)
      pypotree.display_cloud_colab(cloudpath)
 
+
+In a Jupyter notebook:
+
+     import pypotree 
+     import numpy as np
+     xyz = np.random.random((100000,3))
+     cloudpath = pypotree.generate_cloud_for_display(xyz)
+     pypotree.display_cloud(cloudpath)
